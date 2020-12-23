@@ -38,6 +38,7 @@ func GetAuth(c *gin.Context) {
 			if err != nil {
 				code = e.ErrorAuthToken
 			} else {
+				logging.Info(username, "获取token token \n", token)
 				data["token"] = token
 
 				code = e.SUCCESS

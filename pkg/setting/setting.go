@@ -44,7 +44,7 @@ func init() {
 	LoadAliyunMsgConfig()
 	LoadRedis()
 }
-
+// 加载redis配置
 func LoadRedis() {
 	sec, err := Cfg.GetSection("redis")
 	if err != nil {
@@ -74,6 +74,7 @@ func LoadAuth() {
 	AuthSalt = sec.Key("AUTH_SALT ").MustString("!@)*#)!@U#@*!@!)")
 }
 
+// 加载服务配置
 func LoadServer() {
 	sec, err := Cfg.GetSection("server")
 	if err != nil {
@@ -84,6 +85,7 @@ func LoadServer() {
 	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60)) * time.Second
 }
 
+// 加载短信配置
 func LoadAliyunMsgConfig() {
 	sec, err := Cfg.GetSection("aliyun_msg_config")
 	if err != nil {
@@ -95,6 +97,7 @@ func LoadAliyunMsgConfig() {
 	SignName = sec.Key("SIGN_NAME").MustString("")
 }
 
+// 加载运行模式
 func LoadBase() {
 	RunMode = Cfg.Section("").Key("RUN_MODE").MustString("debug")
 }

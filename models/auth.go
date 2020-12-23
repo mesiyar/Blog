@@ -29,11 +29,10 @@ type AuthAccount struct {
 
 func CheckAuth(username, password string) bool {
 	var auth Auth
-	db.Select("id").Where(Auth{Username: username, IsStatus: IsStatusEnable}).First(&auth)
+	db.Select("id,password").Where(Auth{Username: username, IsStatus: IsStatusEnable}).First(&auth)
 	if auth.ID > 0 {
 		passwordEncode := encodePassword(password)
 		if passwordEncode == auth.Password {
-			logging.Info("验证成功")
 			return true
 		}
 	}
