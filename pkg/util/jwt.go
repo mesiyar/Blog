@@ -14,6 +14,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// @Summary 生成token
 func GenerateToken(username, password string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3 * time.Hour)
@@ -23,7 +24,7 @@ func GenerateToken(username, password string) (string, error) {
 		password,
 		jwt.StandardClaims {
 			ExpiresAt : expireTime.Unix(),
-			Issuer : "go-blog",
+			Issuer : "weChat_notify",
 		},
 	}
 
@@ -32,7 +33,7 @@ func GenerateToken(username, password string) (string, error) {
 
 	return token, err
 }
-
+// @Summary 解析token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
