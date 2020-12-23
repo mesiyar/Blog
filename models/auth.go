@@ -74,16 +74,12 @@ func DisableAuthAccount(username string) bool {
 	}
 }
 
-func (auth *Auth) BeforeCreated(scope *gorm.Scope) error {
-	t := time.Now().Unix()
-	logging.Info(t)
-	scope.SetColumn("CreatedOn", t)
+func (auth *Auth) BeforeCreate(scope *gorm.Scope) error {
+	scope.SetColumn("CreatedOn", time.Now().Unix())
 	return nil
 }
 
 func (auth *Auth) BeforeUpdate(scope *gorm.Scope) error {
-	t := time.Now().Unix()
-	logging.Info(t)
 	scope.SetColumn("ModifiedOn", time.Now().Unix())
 
 	return nil
