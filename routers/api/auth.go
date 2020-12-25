@@ -7,6 +7,7 @@ import (
 	"wechatNotify/models"
 	"wechatNotify/pkg/e"
 	"wechatNotify/pkg/logging"
+	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/util"
 )
 
@@ -32,9 +33,9 @@ func GetAuth(c *gin.Context) {
 	code := e.InvalidParams
 	errMsg := ""
 	if ok {
-		isExist := models.CheckAuth(username, password)
+		isExist, id := models.CheckAuth(username, password)
 		if isExist {
-			token, err := util.GenerateToken(username, password)
+			token, err := util.GenerateToken(username, password, id)
 			if err != nil {
 				code = e.ErrorAuthToken
 			} else {
@@ -43,6 +44,12 @@ func GetAuth(c *gin.Context) {
 
 				code = e.SUCCESS
 			}
+			redis := util.Redis{}
+			e := redis.HSet(redisKey.KeyAccountInfo, username, token)
+			if e != nil {
+				logging.Error(e)
+			}
+			logging.Error(e)
 
 		} else {
 			code = e.ErrorAuth
@@ -89,7 +96,7 @@ func CreateAuth(c *gin.Context) {
 	} else {
 		for _, err := range valid.Errors {
 			logging.Info(err.Key, err.Message)
-			errMsg += err.Key +" "+ err.Message
+			errMsg += err.Key + " " + err.Message
 		}
 	}
 
@@ -127,5 +134,15 @@ func DisableAuth(c *gin.Context) {
 		"msg":  e.GetMsg(code),
 		"data": data,
 	})
+}
 
+func Logout(c *gin.Context) {
+	r := util.Redis{}
+	r.HDel(redisKey.KeyAccountInfo,util.UserInfo.Username)
+	code := e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": "",
+	})
 }

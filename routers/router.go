@@ -23,8 +23,7 @@ func InitRouter() *gin.Engine {
 
 	gin.SetMode(setting.RunMode)
 
-	r.GET("/auth", api.GetAuth)
-	r.GET("/create_account", api.CreateAuth)
+	r.POST("/auth", api.GetAuth)
 
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//
@@ -35,6 +34,8 @@ func InitRouter() *gin.Engine {
 		user := v1.UserController{}
 		apiV1.GET("/users", user.GetUsers)
 		apiV1.POST("/disable_account", api.DisableAuth)
+		apiV1.POST("/create_account", api.CreateAuth)
+		apiV1.POST("/logout", api.Logout)
 	}
 
 	return r

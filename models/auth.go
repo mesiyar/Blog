@@ -9,11 +9,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-const (
-	IsStatusEnable  = 1
-	IsStatusDisable = 0
-)
-
 type Auth struct {
 	Model
 
@@ -27,16 +22,20 @@ type AuthAccount struct {
 	Password string `json:"password"`
 }
 
-func CheckAuth(username, password string) bool {
+func CheckAuth(username, password string) (b bool, id int) {
 	var auth Auth
 	db.Select("id,password").Where(Auth{Username: username, IsStatus: IsStatusEnable}).First(&auth)
 	if auth.ID > 0 {
 		passwordEncode := encodePassword(password)
 		if passwordEncode == auth.Password {
-			return true
+			id = auth.ID
+			b = true
+			return
 		}
 	}
-	return false
+	id = 0
+	b = false
+	return
 }
 
 func encodePassword(s string) string {

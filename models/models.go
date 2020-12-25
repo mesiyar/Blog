@@ -5,10 +5,16 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
+	"wechatNotify/pkg/logging"
 	"wechatNotify/pkg/setting"
 )
 
 var db *gorm.DB
+
+const (
+	IsStatusEnable  = 1
+	IsStatusDisable = 0
+)
 
 type Model struct {
 	ID         int `gorm:"primary_key" json:"id"`
@@ -38,7 +44,11 @@ func init() {
 		password,
 		host,
 		dbName))
-
+	logging.Info("链接数据库",fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		user,
+		password,
+		host,
+		dbName))
 	if err != nil {
 		log.Println(err)
 	}

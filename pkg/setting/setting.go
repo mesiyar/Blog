@@ -17,6 +17,7 @@ var (
 
 	PageSize  int
 	JwtSecret string
+	JwtExpireTime time.Duration // 过期时间
 	AuthSalt  string
 
 	SignName     string
@@ -64,6 +65,7 @@ func LoadApp() {
 	}
 	JwtSecret = sec.Key("JWT_SECRET ").MustString("!@)*#)!@U#@*!@!)")
 	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
+	JwtExpireTime = time.Duration(sec.Key("JWT_EXPIRE_TIME").MustInt(1800))
 }
 
 func LoadAuth() {

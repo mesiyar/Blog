@@ -1,30 +1,34 @@
 package util
 
 import (
+	jwt "github.com/dgrijalva/jwt-go"
 	"time"
 	"wechatNotify/pkg/setting"
-	jwt "github.com/dgrijalva/jwt-go"
 )
 
 var jwtSecret = []byte(setting.JwtSecret)
+// 存储接口信息
+var UserInfo *Claims
 
 type Claims struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	ID       int    `json:"id"`
 	jwt.StandardClaims
 }
 
 // @Summary 生成token
-func GenerateToken(username, password string) (string, error) {
+func GenerateToken(username, password string, id int) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(3 * time.Hour)
+	expireTime := nowTime.Add(setting.JwtExpireTime * time.Second)
 
 	claims := Claims{
 		username,
 		password,
-		jwt.StandardClaims {
-			ExpiresAt : expireTime.Unix(),
-			Issuer : "weChat_notify",
+		id,
+		jwt.StandardClaims{
+			ExpiresAt: expireTime.Unix(),
+			Issuer:    "weChat_notify",
 		},
 	}
 
@@ -33,6 +37,7 @@ func GenerateToken(username, password string) (string, error) {
 
 	return token, err
 }
+
 // @Summary 解析token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
@@ -41,6 +46,7 @@ func ParseToken(token string) (*Claims, error) {
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			UserInfo = claims
 			return claims, nil
 		}
 	}
