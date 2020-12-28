@@ -1,7 +1,6 @@
 package util
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -41,7 +40,7 @@ func WeatherGet(t int, s string) (w map[string]interface{}) {
 		logging.Error(fmt.Printf("ioutil.ReadAll failed ,err:%v", err))
 	}
 	logging.Info("返回结果")
-	json.Unmarshal(body, &w)
+	w, _ = JsonDecode(string(body))
 	logging.Info(w)
 	return
 }

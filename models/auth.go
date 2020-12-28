@@ -39,9 +39,8 @@ func CheckAuth(username, password string) (b bool, id int) {
 }
 
 func encodePassword(s string) string {
-	encoder := util.Encoder{}
 	password := s + setting.AuthSalt
-	return encoder.Md5(password)
+	return util.Md5(password)
 }
 
 // 创建账号
