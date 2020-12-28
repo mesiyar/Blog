@@ -29,3 +29,12 @@ func (u *UserController)GetUsers(c *gin.Context) {
 		"data": ret,
 	})
 }
+
+func (u *UserController) GetWeather(c *gin.Context)  {
+	ret := util.WeatherGet(util.GetWeatherCityName, "深圳")
+	c.JSON(http.StatusOK, gin.H{
+		"code": e.SUCCESS,
+		"msg":  e.GetMsg(e.SUCCESS),
+		"data": ret,
+	})
+}

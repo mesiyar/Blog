@@ -15,10 +15,10 @@ var (
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 
-	PageSize  int
-	JwtSecret string
+	PageSize      int
+	JwtSecret     string
 	JwtExpireTime time.Duration // 过期时间
-	AuthSalt  string
+	AuthSalt      string
 
 	SignName     string
 	TemplateCode string
@@ -30,6 +30,10 @@ var (
 	RedisMaxIdle     int
 	RedisMaxActive   int
 	RedisIdleTimeout time.Duration
+// 天气预报配置
+	WeatherUrl       string
+	WeatherAppID     string
+	WeatherAppSecret string
 )
 
 func init() {
@@ -44,7 +48,19 @@ func init() {
 	LoadAuth()
 	LoadAliyunMsgConfig()
 	LoadRedis()
+	LoadWeather()
 }
+// 天气预报配置
+func LoadWeather() {
+	sec, err := Cfg.GetSection("weather")
+	if err != nil {
+		log.Fatalf("Fail to get section 'weather' : %v", err)
+	}
+	WeatherUrl = sec.Key("API_URL").MustString("https://v0.yiketianqi.com/api")
+	WeatherAppID = sec.Key("API_ID").MustString("")
+	WeatherAppSecret = sec.Key("API_SECRET").MustString("")
+}
+
 // 加载redis配置
 func LoadRedis() {
 	sec, err := Cfg.GetSection("redis")
