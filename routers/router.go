@@ -36,7 +36,8 @@ func InitRouter() *gin.Engine {
 		apiV1.POST("/disable_account", api.DisableAuth)
 		apiV1.POST("/create_account", api.CreateAuth)
 		apiV1.POST("/logout", api.Logout)
-		r.GET("weather", user.GetWeather)
+		billing := v1.BillController{}
+		apiV1.POST("/add_billing", billing.AddBilling)
 	}
 
 	return r

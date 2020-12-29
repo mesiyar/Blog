@@ -142,3 +142,15 @@ func (r *Redis) HDel(key, sub string) error {
 
 	return nil
 }
+
+func (r *Redis) HGet(key string, sub string) ([]byte, error) {
+	conn := RedisConn.Get()
+	defer conn.Close()
+
+	data, err := redis.Bytes(conn.Do("HGET", key, sub))
+	if err != nil {
+		return nil, err
+	}
+
+	return data, err
+}

@@ -3,6 +3,8 @@ package util
 import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"time"
+	"wechatNotify/pkg/logging"
+	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/setting"
 )
 
@@ -40,12 +42,18 @@ func GenerateToken(username, password string, id int) (string, error) {
 
 // @Summary 解析token
 func ParseToken(token string) (*Claims, error) {
+	logging.Info("解析token")
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			r := Redis{}
+			_, err := r.HGet(redisKey.KeyAccountInfo, claims.Username)
+			if err != nil {
+				return nil, err
+			}
 			UserInfo = claims
 			return claims, nil
 		}

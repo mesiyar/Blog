@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -45,12 +46,10 @@ func GetAuth(c *gin.Context) {
 				code = e.SUCCESS
 			}
 			redis := util.Redis{}
-			e := redis.HSet(redisKey.KeyAccountInfo, username, token)
-			if e != nil {
-				logging.Error(e)
+			err2 := redis.HSet(redisKey.KeyAccountInfo, username, token)
+			if err2 != nil {
+				logging.Error(err2)
 			}
-			logging.Error(e)
-
 		} else {
 			code = e.ErrorAuth
 		}
@@ -137,8 +136,9 @@ func DisableAuth(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
+	logging.Info(fmt.Sprintf("%s 退出登录", util.UserInfo.Username))
 	r := util.Redis{}
-	r.HDel(redisKey.KeyAccountInfo,util.UserInfo.Username)
+	r.HDel(redisKey.KeyAccountInfo, util.UserInfo.Username)
 	code := e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
