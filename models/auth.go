@@ -45,15 +45,17 @@ func encodePassword(s string) string {
 
 // 创建账号
 func CreateAuthAccount(username string, password string) bool {
-	rs := db.Create(&Auth{
-		Username: username,
-		Password: encodePassword(password),
-		IsStatus: IsStatusEnable,
-	})
+	var auth Auth
+	auth.Username = username
+	auth.Password = encodePassword(password)
+	auth.IsStatus = IsStatusEnable
+
+	rs := db.Create(&auth)
 	if rs.Error != nil {
 		logging.Error(rs.Error)
 		return false
 	}
+	logging.Info(auth.ID)
 	return true
 }
 
