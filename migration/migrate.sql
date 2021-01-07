@@ -7,3 +7,4 @@ CREATE TABLE `t_auth` (
   `is_status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '状态 1 启用 0 禁用',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
+

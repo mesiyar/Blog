@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"wechatNotify/pkg/e"
+	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/util"
 )
 
@@ -14,23 +15,34 @@ func JWT() gin.HandlerFunc {
 		var data interface{}
 
 		code = e.SUCCESS
-		token := c.Request.Header.Get("token")// 拿到token
+		token := c.Request.Header.Get("token") // 拿到token
 		if token == "" {
 			code = e.InvalidParams
 		} else {
 			claims, err := util.ParseToken(token)
+
 			if err != nil {
 				code = e.ErrorAuthCheckTokenFail
-			} else if time.Now().Unix() > claims.ExpiresAt {
-				code = e.ErrorAuthCheckTokenTimeout
+			} else {
+				redis := util.Redis{}
+				t, _ := redis.HGet(redisKey.KeyAccountInfo, claims.Username)
+				t1 := string(t)
+				lt1 := len(t1)
+				if t1[1:(lt1-1)] != token {
+					code = e.ErrorAuthCheckTokenFail
+				} else {
+					if time.Now().Unix() > claims.ExpiresAt {
+						code = e.ErrorAuthCheckTokenTimeout
+					}
+				}
 			}
 		}
 
 		if code != e.SUCCESS {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"code" : code,
-				"msg" : e.GetMsg(code),
-				"data" : data,
+				"code": code,
+				"msg":  e.GetMsg(code),
+				"data": data,
 			})
 
 			c.Abort()

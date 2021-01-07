@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 	"wechatNotify/pkg/logging"
+	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/pkg/util"
 
@@ -22,12 +23,22 @@ type AuthAccount struct {
 	Password string `json:"password"`
 }
 
-func CheckAuth(username, password string) (b bool, id int) {
+func CheckAuth(username, password, ip string) (b bool, id int) {
 	var auth Auth
 	db.Select("id,password").Where(Auth{Username: username, IsStatus: IsStatusEnable}).First(&auth)
 	if auth.ID > 0 {
 		passwordEncode := encodePassword(password)
 		if passwordEncode == auth.Password {
+			logging.Info("验证成功")
+			// 更新最后登录时间 ip
+			data := make(map[string]interface{})
+			data["last_login_time"] = time.Now().Unix()
+			sIp, err := util.Ip2Int(ip)
+			if err != nil {
+				logging.Error("解析ip失败")
+			}
+			data["last_login_ip"] = sIp
+			db.Table("t_auth").Where("id = ?", auth.ID).Update(data)
 			id = auth.ID
 			b = true
 			return
@@ -55,15 +66,18 @@ func CreateAuthAccount(username string, password string) bool {
 		logging.Error(rs.Error)
 		return false
 	}
-	logging.Info(auth.ID)
+	logging.Info("创建新账号", username, "id ", auth.ID)
 	return true
 }
 
+// 禁用账号
 func DisableAuthAccount(username string) bool {
 	data := make(map[string]interface{})
 	data["username"] = username
 	data["is_status"] = IsStatusDisable
 	err := db.Model(&Auth{}).Where("username = ?", username).Update(data)
+	redis := util.Redis{}
+	redis.HDel(redisKey.KeyAccountInfo, username)
 	if err.Error != nil {
 		logging.Error("禁用账号失败")
 		logging.Error(err.Error)

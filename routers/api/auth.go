@@ -34,21 +34,28 @@ func GetAuth(c *gin.Context) {
 	code := e.InvalidParams
 	errMsg := ""
 	if ok {
-		isExist, id := models.CheckAuth(username, password)
+		isExist, id := models.CheckAuth(username, password, c.ClientIP())
 		if isExist {
-			token, err := util.GenerateToken(username, password, id)
-			if err != nil {
-				code = e.ErrorAuthToken
-			} else {
-				logging.Info(username, "获取token token \n", token)
-				data["token"] = token
-
-				code = e.SUCCESS
-			}
 			redis := util.Redis{}
-			err2 := redis.HSet(redisKey.KeyAccountInfo, username, token)
-			if err2 != nil {
-				logging.Error(err2)
+			token, err := redis.HGet(redisKey.KeyAccountInfo, username)
+			if err == nil {
+				logging.Info(username, "从缓存中获取token token \n", string(token))
+				data["token"] = token
+				code = e.SUCCESS
+			} else {
+				token, err := util.GenerateToken(username, password, id)
+				if err != nil {
+					code = e.ErrorAuthToken
+				} else {
+					logging.Info(username, "获取token token \n", token)
+					data["token"] = token
+
+					code = e.SUCCESS
+				}
+				err2 := redis.HSet(redisKey.KeyAccountInfo, username, token)
+				if err2 != nil {
+					logging.Error(err2)
+				}
 			}
 		} else {
 			code = e.ErrorAuth
@@ -69,6 +76,13 @@ func GetAuth(c *gin.Context) {
 	})
 }
 
+// @Summary 创建账号
+// @Produce  json
+// @Param username query string true "用户名"
+// @Param password query string true "密码"
+// @Param token query string true "token"
+// @Success 200 {string} json "{"code":200,"data":"ok","msg":"ok"}"
+// @Router /api/v1/create_account [get]
 func CreateAuth(c *gin.Context) {
 
 	username := c.PostForm("username")
@@ -138,7 +152,9 @@ func DisableAuth(c *gin.Context) {
 func Logout(c *gin.Context) {
 	logging.Info(fmt.Sprintf("%s 退出登录", util.UserInfo.Username))
 	r := util.Redis{}
-	r.HDel(redisKey.KeyAccountInfo, util.UserInfo.Username)
+	if err := r.HDel(redisKey.KeyAccountInfo, util.UserInfo.Username); err != nil {
+		logging.Info("清理redis缓存失败, ", err)
+	}
 	code := e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
