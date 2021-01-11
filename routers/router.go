@@ -5,6 +5,7 @@ import (
 	//"cloud-notes/src/middleware/jwt"
 	//v1 "cloud-notes/src/routers/api/v1"
 	"github.com/gin-gonic/gin"
+	"wechatNotify/middleware/cros"
 	"wechatNotify/middleware/jwt"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/routers/api"
@@ -20,6 +21,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 
 	r.Use(gin.Recovery())
+	r.Use(cros.Cros())
 
 	gin.SetMode(setting.RunMode)
 
@@ -27,17 +29,22 @@ func InitRouter() *gin.Engine {
 
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//
-	apiV1 := r.Group("/api/v1")
+	V1 := r.Group("/api/v1")
 
-	apiV1.Use(jwt.JWT())
+	V1.Use(jwt.JWT())
 	{
 		user := v1.UserController{}
-		apiV1.GET("/users", user.GetUsers)
-		apiV1.POST("/disable_account", api.DisableAuth)
-		apiV1.POST("/create_account", api.CreateAuth)
-		apiV1.POST("/logout", api.Logout)
+		V1.GET("/users", user.GetUsers)
+		V1.POST("/disable_account", api.DisableAuth)
+		V1.POST("/create_account", api.CreateAuth)
+		V1.POST("/logout", api.Logout)
 		billing := v1.BillController{}
-		apiV1.POST("/add_billing", billing.AddBilling)
+		V1.POST("/add_billing", billing.AddBilling)
+
+		tag := v1.TagController{}
+		V1.POST("/add_tag", tag.Add)
+		V1.POST("/update_tag", tag.Update)
+		V1.DELETE("/delete_tag", tag.Delete)
 	}
 
 	return r

@@ -9,6 +9,7 @@ import (
 )
 
 var jwtSecret = []byte(setting.JwtSecret)
+
 // 存储接口信息
 var UserInfo *Claims
 
@@ -20,10 +21,9 @@ type Claims struct {
 }
 
 // @Summary 生成token
-func GenerateToken(username, password string, id int) (string, error) {
+func GenerateToken(username, password string, id int) (string, int64, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(setting.JwtExpireTime * time.Second)
-
 	claims := Claims{
 		username,
 		password,
@@ -37,12 +37,12 @@ func GenerateToken(username, password string, id int) (string, error) {
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokenClaims.SignedString(jwtSecret)
 
-	return token, err
+	return token, expireTime.Unix(), err
 }
 
 // @Summary 解析token
 func ParseToken(token string) (*Claims, error) {
-	logging.Info("解析token")
+	logging.Info("解析token", token)
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
@@ -54,10 +54,11 @@ func ParseToken(token string) (*Claims, error) {
 			if err != nil {
 				return nil, err
 			}
+			logging.Info("解析成功")
 			UserInfo = claims
 			return claims, nil
 		}
 	}
-
+	logging.Info("解析失败", err.Error())
 	return nil, err
 }

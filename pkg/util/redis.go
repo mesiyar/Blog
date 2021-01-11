@@ -13,7 +13,7 @@ type Redis struct {
 
 var RedisConn *redis.Pool
 
-func (r *Redis) Init() error {
+func InitRedis() error {
 	RedisConn = &redis.Pool{
 		MaxIdle:     setting.RedisMaxIdle,
 		MaxActive:   setting.RedisMaxActive,
@@ -31,6 +31,7 @@ func (r *Redis) Init() error {
 					return nil, err
 				}
 			}
+			logging.Info("redis 链接成功!", setting.RedisHost)
 			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {

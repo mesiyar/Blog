@@ -11,6 +11,8 @@ var MsgFlags = map[int]string{
 	ErrorAuthnameExist:         "用户名已存在",
 	ErrorAccountIsDisabled:     "账号已禁用",
 	ErrorAccountNotExist:       "账号不存在",
+	ErrorTagExist:              "标签已存在",
+	ErrorTagNotExist:           "标签不存在",
 }
 
 /**

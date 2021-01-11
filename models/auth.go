@@ -6,8 +6,6 @@ import (
 	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/pkg/util"
-
-	"github.com/jinzhu/gorm"
 )
 
 type Auth struct {
@@ -86,17 +84,6 @@ func DisableAuthAccount(username string) bool {
 		logging.Info("禁用账号成功")
 		return true
 	}
-}
-
-func (auth *Auth) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("CreatedOn", time.Now().Unix())
-	return nil
-}
-
-func (auth *Auth) BeforeUpdate(scope *gorm.Scope) error {
-	scope.SetColumn("ModifiedOn", time.Now().Unix())
-
-	return nil
 }
 
 func CheckAuthName(username string) bool {

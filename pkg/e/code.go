@@ -12,4 +12,6 @@ const (
 	ErrorAuthnameExist         = 20005
 	ErrorAccountIsDisabled     = 20006
 	ErrorAccountNotExist       = 20007
+	ErrorTagExist              = 20008
+	ErrorTagNotExist           = 20009
 )

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
@@ -24,9 +25,10 @@ type auth struct {
 // @Success 200 {string} json "{"code":200,"data":{"token":""},"msg":"ok"}"
 // @Router /auth [get]
 func GetAuth(c *gin.Context) {
-	username := c.Query("username")
-	password := c.Query("password")
+	username := c.PostForm("username")
+	password := c.PostForm("password")
 
+	logging.Info(username, password)
 	valid := validation.Validation{}
 	a := auth{Username: username, Password: password}
 	ok, _ := valid.Valid(&a)
@@ -39,20 +41,23 @@ func GetAuth(c *gin.Context) {
 			redis := util.Redis{}
 			token, err := redis.HGet(redisKey.KeyAccountInfo, username)
 			if err == nil {
-				logging.Info(username, "从缓存中获取token token \n", string(token))
-				data["token"] = token
+				var dat map[string]interface{}
+				json.Unmarshal(token, &dat)
+				data= dat
 				code = e.SUCCESS
 			} else {
-				token, err := util.GenerateToken(username, password, id)
+				token, expire, err := util.GenerateToken(username, password, id)
 				if err != nil {
 					code = e.ErrorAuthToken
 				} else {
 					logging.Info(username, "获取token token \n", token)
 					data["token"] = token
+					data["expire"] = expire
+					data["user"] = username
 
 					code = e.SUCCESS
 				}
-				err2 := redis.HSet(redisKey.KeyAccountInfo, username, token)
+				err2 := redis.HSet(redisKey.KeyAccountInfo, username, data)
 				if err2 != nil {
 					logging.Error(err2)
 				}
