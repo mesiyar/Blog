@@ -1,7 +1,7 @@
 package routers
 
 import (
-	//_ "cloud-notes/src/docs"
+	_ "wechatNotify/docs"
 	//"cloud-notes/src/middleware/jwt"
 	//v1 "cloud-notes/src/routers/api/v1"
 	"github.com/gin-gonic/gin"
@@ -11,8 +11,8 @@ import (
 	"wechatNotify/routers/api"
 	v1 "wechatNotify/routers/api/v1"
 
-	//ginSwagger "github.com/swaggo/gin-swagger"
-	//"github.com/swaggo/gin-swagger/swaggerFiles"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 func InitRouter() *gin.Engine {
@@ -27,7 +27,7 @@ func InitRouter() *gin.Engine {
 
 	r.POST("/auth", api.GetAuth)
 
-	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//
 	V1 := r.Group("/api/v1")
 

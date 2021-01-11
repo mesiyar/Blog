@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -27,8 +26,7 @@ func JWT() gin.HandlerFunc {
 			} else {
 				redis := util.Redis{}
 				t, _ := redis.HGet(redisKey.KeyAccountInfo, claims.Username)
-				t1 := make(map[string]interface{})
-				json.Unmarshal(t, &t1)
+				t1,_ := util.JsonDecode(string(t))
 
 				if t1["token"] != token {
 					code = e.ErrorAuthCheckTokenFail

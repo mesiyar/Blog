@@ -66,6 +66,7 @@ func (t TagController) Update(c *gin.Context) {
 	})
 }
 
+//
 func (t TagController) Delete(c *gin.Context) {
 	id := com.StrTo(c.Param("id")).MustInt()
 

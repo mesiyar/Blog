@@ -19,11 +19,12 @@ type auth struct {
 }
 
 // @Summary 获取认证
+// @Accept application/x-www-form-urlencoded
 // @Produce  json
-// @Param username query string true "用户名"
-// @Param password query string true "密码"
-// @Success 200 {string} json "{"code":200,"data":{"token":""},"msg":"ok"}"
-// @Router /auth [get]
+// @Param username formData string true "用户名"
+// @Param password formData string true "密码"
+// @Success 200 {string} json "{"code":200,"data":{"token":"", "user":"","expire":""},"msg":"ok"}"
+// @Router /auth [post]
 func GetAuth(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
@@ -83,11 +84,11 @@ func GetAuth(c *gin.Context) {
 
 // @Summary 创建账号
 // @Produce  json
-// @Param username query string true "用户名"
-// @Param password query string true "密码"
-// @Param token query string true "token"
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
+// @Param token header string true "token"
 // @Success 200 {string} json "{"code":200,"data":"ok","msg":"ok"}"
-// @Router /api/v1/create_account [get]
+// @Router /api/v1/create_account [post]
 func CreateAuth(c *gin.Context) {
 
 	username := c.PostForm("username")

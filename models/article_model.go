@@ -13,3 +13,5 @@ type Article struct {
 	ModifiedBy string `json:"modified_by"`
 	State      int    `json:"state"`
 }
+
+
