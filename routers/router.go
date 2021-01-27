@@ -30,10 +30,10 @@ func InitRouter() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//
 	V1 := r.Group("/api/v1")
-
+	admin := r.Group("/admin")
+	user := v1.UserController{}
 	V1.Use(jwt.JWT())
 	{
-		user := v1.UserController{}
 		V1.GET("/users", user.GetUsers)
 		V1.POST("/disable_account", api.DisableAuth)
 		V1.POST("/create_account", api.CreateAuth)
@@ -41,10 +41,17 @@ func InitRouter() *gin.Engine {
 		billing := v1.BillController{}
 		V1.POST("/add_billing", billing.AddBilling)
 
+
+	}
+
+	admin.Use(jwt.JWT())
+	{
+		admin.GET("/get_user_info", user.GetUserInfo)
 		tag := v1.TagController{}
-		V1.POST("/add_tag", tag.Add)
-		V1.POST("/update_tag", tag.Update)
-		V1.DELETE("/delete_tag", tag.Delete)
+		admin.GET("/tags", tag.List)
+		admin.POST("/add_tag", tag.Add)
+		admin.POST("/update_tag", tag.Update)
+		admin.DELETE("/delete_tag", tag.Delete)
 	}
 
 	return r

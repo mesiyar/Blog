@@ -11,9 +11,11 @@ import (
 type Auth struct {
 	Model
 
-	Username string `json:"username"`
-	Password string `json:"password"`
-	IsStatus int    `json:"is_status"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	IsStatus      int    `json:"is_status"`
+	LastLoginTime int    `json:"last_login_time"`
+	LastLoginIp   int    `json:"last_login_ip"`
 }
 
 type AuthAccount struct {
