@@ -69,7 +69,7 @@ func (t TagController) Update(c *gin.Context) {
 
 //
 func (t TagController) Delete(c *gin.Context) {
-	id := com.StrTo(c.Param("id")).MustInt()
+	id := com.StrTo(c.Query("id")).MustInt()
 
 	valid := validation.Validation{}
 	valid.Min(id, 1, "id").Message("ID必须大于0")
@@ -99,17 +99,24 @@ func (t *TagController) List(c *gin.Context) {
 		maps["name"] = name
 	}
 
-	var state int = -1
-
-	if arg := c.Query("state"); arg != "" {
-		state = com.StrTo(arg).MustInt()
-		maps["state"] = state
-	}
+	var state int = 1
+	maps["state"] = state
 
 	code := e.SUCCESS
 
 	data["lists"] = tagModel.GetTags(util.GetPage(c), setting.PageSize, maps)
 	data["total"] = tagModel.GetTagTotal(maps)
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": data,
+	})
+}
+
+func (t *TagController) AllTags(c * gin.Context)  {
+	data := make(map[string]interface{})
+	data["lists"] = tagModel.GetAll()
+	code := e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),

@@ -67,8 +67,8 @@ func LoadRedis() {
 	if err != nil {
 		log.Fatalf("Fail to get section 'redis' : %v", err)
 	}
-	RedisHost = sec.Key("HOST").MustString("127.0.0.1:6379")
-	RedisPassword = sec.Key("PASSWORD").MustString("")
+	RedisHost = sec.Key("Host").MustString("127.0.0.1:6379")
+	RedisPassword = sec.Key("Password").MustString("")
 	RedisMaxIdle = sec.Key("MaxIdle").MustInt(30)
 	RedisMaxActive = sec.Key("MaxActive").MustInt(30)
 	RedisIdleTimeout = time.Duration(sec.Key("IdleTimeout").MustInt(200))

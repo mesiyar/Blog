@@ -66,7 +66,13 @@ func (tag *TagModel) ExistTagByID(id int) bool {
 func (tag *TagModel) DeleteTag(id int) bool {
 	data := make(map[string]interface{})
 	data["state"] = IsStatusDisable
-	db.Where("id = ?", id).Update(data)
+	db.Model(&Tag{}).Where("id = ?", id).Update(data)
 
 	return true
+}
+
+func (tag *TagModel) GetAll() (tags []Tag) {
+	db.Find(&tags)
+
+	return
 }
