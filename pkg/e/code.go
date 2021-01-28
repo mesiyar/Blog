@@ -14,4 +14,5 @@ const (
 	ErrorAccountNotExist       = 20007
 	ErrorTagExist              = 20008
 	ErrorTagNotExist           = 20009
+	ErrorArticleNotExist       = 20010
 )
