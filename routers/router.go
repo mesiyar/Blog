@@ -47,6 +47,13 @@ func InitRouter() *gin.Engine {
 		admin.GET("/all_tags", tag.AllTags)
 		billing := v1.BillController{}
 		admin.POST("/add_billing", billing.AddBilling)
+		// 文章管理
+		article := v1.ArticleController{}
+		admin.GET("/article", article.GetArticle)
+		admin.GET("/articles", article.GetArticles)
+		admin.POST("/add_article", article.AddArticle)
+		admin.POST("/update_article", article.EditArticle)
+		admin.DELETE("/delete_article", article.DeleteArticle)
 	}
 
 	return r
