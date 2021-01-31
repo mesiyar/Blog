@@ -19,7 +19,7 @@ var articleModel = new(models.ArticleModel)
 
 //获取单个文章
 func (a ArticleController) GetArticle(c *gin.Context) {
-	id := com.StrTo(c.Param("id")).MustInt()
+	id := com.StrTo(c.Query("id")).MustInt()
 
 	valid := validation.Validation{}
 	valid.Min(id, 1, "id").Message("ID必须大于0")
@@ -61,6 +61,11 @@ func (a ArticleController) GetArticles(c *gin.Context) {
 		valid.Min(tagId, 1, "tag_id").Message("标签ID必须大于0")
 	}
 
+	if arg := c.Query("tag_name"); arg != "" {
+		tag := tagModel.GetTagByName(arg)
+		maps["tag_id"] = tag.ID
+	}
+
 	code := e.InvalidParams
 	if ! valid.HasErrors() {
 		code = e.SUCCESS
@@ -87,6 +92,7 @@ func (a ArticleController) AddArticle(c *gin.Context) {
 	title := c.PostForm("title")
 	desc := c.PostForm("desc")
 	content := c.PostForm("content")
+	isTop := c.PostForm("is_top")
 	createdBy := util.UserInfo.Username
 	state := models.IsStatusEnable
 
@@ -96,6 +102,7 @@ func (a ArticleController) AddArticle(c *gin.Context) {
 	valid.Required(desc, "desc").Message("简述不能为空")
 	valid.Required(content, "content").Message("内容不能为空")
 	valid.Required(createdBy, "created_by").Message("创建人不能为空")
+	valid.Required(isTop, "is_top").Message("是否置顶不能为空")
 
 	code := e.InvalidParams
 	if ! valid.HasErrors() {
@@ -107,6 +114,7 @@ func (a ArticleController) AddArticle(c *gin.Context) {
 			data["content"] = content
 			data["created_by"] = createdBy
 			data["state"] = state
+			data["is_top"] = isTop
 
 			articleModel.AddArticle(data)
 			code = e.SUCCESS
@@ -142,6 +150,11 @@ func (a ArticleController) EditArticle(c *gin.Context) {
 		state = com.StrTo(arg).MustInt()
 		valid.Range(state, 0, 1, "state").Message("状态只允许0或1")
 	}
+	var isTop int = 0
+	if arg1 := c.PostForm("is_top"); arg1 != "" {
+		isTop = com.StrTo(arg1).MustInt()
+		valid.Range(isTop, 0, 1, "state").Message("状态只允许0或1")
+	}
 
 	valid.Min(id, 1, "id").Message("ID必须大于0")
 	valid.MaxSize(title, 100, "title").Message("标题最长为100字符")
@@ -168,6 +181,8 @@ func (a ArticleController) EditArticle(c *gin.Context) {
 					data["content"] = content
 				}
 
+				data["is_top"] = isTop
+
 				data["modified_by"] = modifiedBy
 
 				articleModel.EditArticle(id, data)
@@ -193,7 +208,7 @@ func (a ArticleController) EditArticle(c *gin.Context) {
 
 //删除文章
 func (a ArticleController) DeleteArticle(c *gin.Context) {
-	id := com.StrTo(c.Param("id")).MustInt()
+	id := com.StrTo(c.Query("id")).MustInt()
 
 	valid := validation.Validation{}
 	valid.Min(id, 1, "id").Message("ID必须大于0")

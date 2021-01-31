@@ -10,6 +10,7 @@ import (
 	"wechatNotify/pkg/e"
 	"wechatNotify/pkg/logging"
 	"wechatNotify/pkg/redisKey"
+	"wechatNotify/pkg/setting"
 	"wechatNotify/pkg/util"
 )
 
@@ -58,7 +59,7 @@ func GetAuth(c *gin.Context) {
 
 					code = e.SUCCESS
 				}
-				err2 := redis.HSet(redisKey.KeyAccountInfo, username, data)
+				err2 := redis.Set(redisKey.KeyAccountInfo, data, int(setting.JwtExpireTime))
 				if err2 != nil {
 					logging.Error(err2)
 				}
@@ -158,7 +159,7 @@ func DisableAuth(c *gin.Context) {
 func Logout(c *gin.Context) {
 	logging.Info(fmt.Sprintf("%s 退出登录", util.UserInfo.Username))
 	r := util.Redis{}
-	if err := r.HDel(redisKey.KeyAccountInfo, util.UserInfo.Username); err != nil {
+	if _,err := r.Delete(redisKey.KeyAccountInfo); err != nil {
 		logging.Info("清理redis缓存失败, ", err)
 	}
 	code := e.SUCCESS

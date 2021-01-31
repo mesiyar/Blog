@@ -31,6 +31,11 @@ func InitRouter() *gin.Engine {
 	//
 	admin := r.Group("/admin")
 	user := v1.UserController{}
+	tag := v1.TagController{}
+	r.GET("/all_tags", tag.AllTags)
+	article := v1.ArticleController{}
+	r.GET("/article", article.GetArticle)
+	r.GET("/articles", article.GetArticles)
 
 	admin.Use(jwt.JWT())
 	{
@@ -39,7 +44,7 @@ func InitRouter() *gin.Engine {
 		admin.POST("/create_account", api.CreateAuth)
 		admin.POST("/logout", api.Logout)
 		admin.GET("/get_user_info", user.GetUserInfo)
-		tag := v1.TagController{}
+
 		admin.GET("/tags", tag.List)
 		admin.POST("/add_tag", tag.Add)
 		admin.POST("/update_tag", tag.Update)
@@ -48,7 +53,6 @@ func InitRouter() *gin.Engine {
 		billing := v1.BillController{}
 		admin.POST("/add_billing", billing.AddBilling)
 		// 文章管理
-		article := v1.ArticleController{}
 		admin.GET("/article", article.GetArticle)
 		admin.GET("/articles", article.GetArticles)
 		admin.POST("/add_article", article.AddArticle)

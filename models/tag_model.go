@@ -35,6 +35,13 @@ func (tag *TagModel) ExistTagByName(name string) bool {
 	return false
 }
 
+func (tag *TagModel) GetTagByName(name string) Tag {
+	var t Tag
+	db.Select("id").Where("name = ? and state = ?", name, IsStatusEnable).First(&t)
+	return t
+}
+
+
 func (tag *TagModel) AddTag(name string, createdBy string) bool {
 	db.Create(&Tag{
 		Name:      name,

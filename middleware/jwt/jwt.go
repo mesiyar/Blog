@@ -25,10 +25,9 @@ func JWT() gin.HandlerFunc {
 				code = e.ErrorAuthCheckTokenFail
 			} else {
 				redis := util.Redis{}
-				t, _ := redis.HGet(redisKey.KeyAccountInfo, claims.Username)
+				t, _ := redis.Get(redisKey.KeyAccountInfo)
 				t1,_ := util.JsonDecode(string(t))
-
-				if t1["token"] != token {
+				if t1 != nil && t1["token"] != token {
 					code = e.ErrorAuthCheckTokenFail
 				} else {
 					if time.Now().Unix() > claims.ExpiresAt {

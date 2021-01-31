@@ -4,7 +4,6 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"time"
 	"wechatNotify/pkg/logging"
-	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/setting"
 )
 
@@ -49,11 +48,6 @@ func ParseToken(token string) (*Claims, error) {
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-			r := Redis{}
-			_, err := r.HGet(redisKey.KeyAccountInfo, claims.Username)
-			if err != nil {
-				return nil, err
-			}
 			logging.Info("解析成功")
 			UserInfo = claims
 			return claims, nil

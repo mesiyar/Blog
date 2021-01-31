@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"time"
+	"wechatNotify/pkg/logging"
+)
 
 type Article struct {
 	Model
@@ -14,7 +17,8 @@ type Article struct {
 	CreatedBy  string `json:"created_by"`
 	ModifiedBy string `json:"modified_by"`
 	State      int    `json:"state"`
-	ReadNums   int    `json:"read_nums"`
+	ViewCount  int    `json:"view_count"`
+	IsTop      int    `json:"is_top"` // 是否置顶
 }
 
 type ArticleModel struct {
@@ -46,6 +50,7 @@ func (a ArticleModel) GetArticle(id int) (article Article) {
 }
 
 func (a ArticleModel) EditArticle(id int, data interface{}) bool {
+	logging.Info(data)
 	db.Model(&Article{}).Where("id = ?", id).Updates(data)
 
 	return true
@@ -59,6 +64,7 @@ func (a ArticleModel) AddArticle(data map[string]interface{}) bool {
 		Content:   data["content"].(string),
 		CreatedBy: data["created_by"].(string),
 		State:     data["state"].(int),
+		IsTop:     data["is_top"].(int),
 	})
 
 	return true
