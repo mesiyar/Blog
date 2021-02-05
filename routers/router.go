@@ -3,11 +3,8 @@ package routers
 import (
 	"net/http"
 	_ "wechatNotify/docs"
-	"wechatNotify/pkg/e"
 	"wechatNotify/pkg/upload"
 
-	//"cloud-notes/src/middleware/jwt"
-	//v1 "cloud-notes/src/routers/api/v1"
 	"github.com/gin-gonic/gin"
 	"wechatNotify/middleware/cros"
 	"wechatNotify/middleware/jwt"
@@ -38,23 +35,11 @@ func InitRouter() *gin.Engine {
 	tag := v1.TagController{}
 	r.GET("/all_tags", tag.AllTags)
 	article := v1.ArticleController{}
+	config := v1.ConfigController{}
 	r.GET("/article", article.GetArticle)
 	r.GET("/articles", article.GetArticles)
 	r.GET("/top_articles", article.GetTopArticle)
-	r.GET("/site_config", func(c *gin.Context) {
-		data := make(map[string]interface{})
-		data["site_name"] = "Learn & Go"
-		data["slogan"] = "生活不只有代码,还有诗与远方"
-		data["domain"] = "http://www.learnkai.top"
-		data["avatar"] = "https://portrait.gitee.com/uploads/avatars/user/1826/5479666_mesiyar_1609398603.png!avatar200"
-		data["desc"] = "php golang 开发仔"
-		code := 200
-		c.JSON(http.StatusOK, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": data,
-		})
-	})
+	r.GET("/site_config", config.SiteConfig)
 
 	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 
@@ -79,6 +64,11 @@ func InitRouter() *gin.Engine {
 		admin.POST("/add_article", article.AddArticle)
 		admin.POST("/update_article", article.EditArticle)
 		admin.DELETE("/delete_article", article.DeleteArticle)
+		// 配置管理
+		admin.GET("/configs", config.GetConfigs)
+		admin.POST("/add_config", config.AddConfig)
+		admin.POST("/update_config", config.EditConfig)
+		admin.DELETE("/delete_config", config.DeleteConfig)
 	}
 
 	return r
