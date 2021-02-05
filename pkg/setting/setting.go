@@ -34,6 +34,9 @@ var (
 	WeatherUrl       string
 	WeatherAppID     string
 	WeatherAppSecret string
+	ImagePrefixUrl  string
+	ImageSavePath string
+	RuntimeRootPath string
 )
 
 func init() {
@@ -42,6 +45,9 @@ func init() {
 	if err != nil {
 		log.Fatalf("Fail to parse 'conf/app.ini' : %v", err)
 	}
+	ImagePrefixUrl = "http://127.0.0.1:8000"
+	ImageSavePath = "upload/images/"
+	RuntimeRootPath = "runtime/"
 	LoadBase()
 	LoadServer()
 	LoadApp()

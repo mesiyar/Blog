@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"wechatNotify/models"
+	"wechatNotify/pkg/cache"
 	"wechatNotify/pkg/e"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/pkg/util"
@@ -27,12 +28,19 @@ func (a ArticleController) GetArticle(c *gin.Context) {
 	code := e.InvalidParams
 	var data interface{}
 	if ! valid.HasErrors() {
-		if articleModel.ExistArticleByID(id) {
-			data = articleModel.GetArticle(id)
-			code = e.SUCCESS
+		if d, ok := cache.Exists(id); !ok {
+			if articleModel.ExistArticleByID(id) {
+				data = articleModel.GetArticle(id)
+				code = e.SUCCESS
+				cache.Set(id, data)
+			} else {
+				code = e.ErrorArticleNotExist
+			}
 		} else {
-			code = e.ErrorArticleNotExist
+			code = e.SUCCESS
+			data = d
 		}
+
 	} else {
 		for _, err := range valid.Errors {
 			log.Printf("err.key: %s, err.message: %s", err.Key, err.Message)
@@ -186,6 +194,7 @@ func (a ArticleController) EditArticle(c *gin.Context) {
 				data["modified_by"] = modifiedBy
 
 				articleModel.EditArticle(id, data)
+				cache.Set(id, data)
 				code = e.SUCCESS
 			} else {
 				code = e.ErrorTagNotExist
@@ -218,6 +227,7 @@ func (a ArticleController) DeleteArticle(c *gin.Context) {
 		if articleModel.ExistArticleByID(id) {
 			articleModel.DeleteArticle(id)
 			code = e.SUCCESS
+			cache.Del(id)
 		} else {
 			code = e.ErrorArticleNotExist
 		}
@@ -231,5 +241,19 @@ func (a ArticleController) DeleteArticle(c *gin.Context) {
 		"code": code,
 		"msg":  e.GetMsg(code),
 		"data": make(map[string]string),
+	})
+}
+
+func (a ArticleController) GetTopArticle(c *gin.Context) {
+
+	code := e.SUCCESS
+	var data interface{}
+
+	data = articleModel.GetTopArticle()
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": data,
 	})
 }

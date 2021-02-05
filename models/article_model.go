@@ -78,3 +78,9 @@ func (a ArticleModel) DeleteArticle(id int) bool {
 
 	return true
 }
+
+func (a ArticleModel) GetTopArticle() (articles []Article) {
+	db.Preload("Tag").Where("is_top = 1").Order("created_by desc").Limit(10).Find(&articles)
+
+	return
+}
