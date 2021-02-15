@@ -8,12 +8,12 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     let headers = {
-      "token": localStorage.getItem('token')
+      "Token": localStorage.getItem('token')
     }
     if (config.method == 'post') {
       headers = {
         "Content-Type": "application/x-www-form-urlencoded",
-        "token": localStorage.getItem('token')
+        "Token": localStorage.getItem('token')
       }
     }
     config.headers =headers
