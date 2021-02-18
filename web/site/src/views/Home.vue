@@ -45,7 +45,7 @@
     import Post from '@/components/post'
     import SmallIco from '@/components/small-ico'
     import Quote from '@/components/quote'
-    import {fetchFocus, fetchList} from '../api'
+    import {fetchFocus, fetchList, searchArticles} from '../api'
 
     export default {
         name: 'Home',
@@ -81,9 +81,9 @@
             }
         },
         methods: {
-            fetchFocus() {
-                fetchFocus().then(res => {
-                    this.features = res.data || []
+            searchArticles(keywords) {
+                searchArticles({keywords:keywords}).then(res => {
+                    this.postList = res.data.lists || []
                 }).catch(err => {
                     console.log(err)
                 })
@@ -103,7 +103,7 @@
                     this.currPage = res.data.page
                     this.hasNextPage = res.data.hasNextPage
                 })
-            }
+            },
         },
         mounted() {
            // this.fetchFocus();
@@ -112,7 +112,8 @@
         watch : {
           $route:{
                 handler(nv,ov){
-                    this.fetchList();
+                    console.log(nv,ov)
+                    this.searchArticles(nv.params.words);
                 }
             },
             deep:true

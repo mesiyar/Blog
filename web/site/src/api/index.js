@@ -9,6 +9,15 @@ export function fetchList(params) {
     })
 }
 
+export function searchArticles(params) {
+
+    return request({
+        url: '/search_article',
+        method: 'get',
+        params: params
+    })
+}
+
 export function fetchArticle(params) {
 
   return request({

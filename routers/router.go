@@ -38,6 +38,7 @@ func InitRouter() *gin.Engine {
 	config := v1.ConfigController{}
 	r.GET("/article", article.GetArticle)
 	r.GET("/articles", article.GetArticles)
+	r.GET("/search_article", article.GetByKeywords)
 	r.GET("/top_articles", article.GetTopArticle)
 	r.GET("/site_config", config.SiteConfig)
 

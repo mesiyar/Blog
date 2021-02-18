@@ -54,6 +54,22 @@ func (a ArticleController) GetArticle(c *gin.Context) {
 	})
 }
 
+func (a ArticleController) GetByKeywords(c *gin.Context)  {
+	data := make(map[string]interface{})
+
+	keywords := c.Query("keywords")
+	code := e.SUCCESS
+
+	code = e.SUCCESS
+	data["lists"] = articleModel.GetArticlesByKeywords(util.GetPage(c), setting.PageSize, keywords)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": data,
+	})
+}
+
 //获取多个文章
 func (a ArticleController) GetArticles(c *gin.Context) {
 	data := make(map[string]interface{})

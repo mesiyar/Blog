@@ -36,6 +36,12 @@ func (a ArticleModel) GetArticleTotal(maps interface{}) (count int) {
 	return
 }
 
+func (a ArticleModel) GetArticlesByKeywords(pageNum int, pageSize int, keywords string) (articles []Article) {
+	db.Preload("Tag").Where("title like ? and state = ?", "%"+keywords+"%", IsStatusEnable).Offset(pageNum).Limit(pageSize).Find(&articles)
+
+	return
+}
+
 func (a ArticleModel) GetArticles(pageNum int, pageSize int, maps interface{}) (articles []Article) {
 	db.Preload("Tag").Where(maps).Offset(pageNum).Limit(pageSize).Find(&articles)
 
