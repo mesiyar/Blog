@@ -19,6 +19,7 @@ type Article struct {
 	State      int    `json:"state"`
 	ViewCount  int    `json:"view_count"`
 	IsTop      int    `json:"is_top"` // 是否置顶
+	IsPub      int    `json:"is_pub"` // 是否草稿
 }
 
 type ArticleModel struct {
@@ -37,7 +38,7 @@ func (a ArticleModel) GetArticleTotal(maps interface{}) (count int) {
 }
 
 func (a ArticleModel) GetArticlesByKeywords(pageNum int, pageSize int, keywords string) (articles []Article) {
-	db.Preload("Tag").Where("title like ? and state = ?", "%"+keywords+"%", IsStatusEnable).Offset(pageNum).Limit(pageSize).Find(&articles)
+	db.Preload("Tag").Where("title like ? and state = ? and is_pub = ?", "%"+keywords+"%", IsStatusEnable, 1).Offset(pageNum).Limit(pageSize).Find(&articles)
 
 	return
 }
@@ -71,6 +72,7 @@ func (a ArticleModel) AddArticle(data map[string]interface{}) bool {
 		CreatedBy: data["created_by"].(string),
 		State:     data["state"].(int),
 		IsTop:     data["is_top"].(int),
+		IsPub:     data["is_pub"].(int),
 	})
 
 	return true

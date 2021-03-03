@@ -41,7 +41,7 @@ func InitRouter() *gin.Engine {
 	r.GET("/search_article", article.GetByKeywords)
 	r.GET("/top_articles", article.GetTopArticle)
 	r.GET("/site_config", config.SiteConfig)
-
+	// 静态文件目录
 	r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 
 	admin.Use(jwt.JWT())

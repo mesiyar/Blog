@@ -76,6 +76,7 @@ func (a ArticleController) GetArticles(c *gin.Context) {
 	maps := make(map[string]interface{})
 	valid := validation.Validation{}
 	maps["state"] = models.IsStatusEnable
+	maps["is_pub"] = 1
 
 	var tagId int = -1
 	if arg := c.Query("tag_id"); arg != "" {
@@ -117,6 +118,7 @@ func (a ArticleController) AddArticle(c *gin.Context) {
 	desc := c.PostForm("desc")
 	content := c.PostForm("content")
 	isTop := c.PostForm("is_top")
+	isPub := c.PostForm("is_pub")
 	createdBy := util.UserInfo.Username
 	state := models.IsStatusEnable
 
@@ -138,7 +140,7 @@ func (a ArticleController) AddArticle(c *gin.Context) {
 			data["content"] = content
 			data["created_by"] = createdBy
 			data["state"] = state
-			data["is_top"] = isTop
+			data["is_top"] = isPub
 
 			articleModel.AddArticle(data)
 			code = e.SUCCESS
@@ -167,6 +169,7 @@ func (a ArticleController) EditArticle(c *gin.Context) {
 	title := c.PostForm("title")
 	desc := c.PostForm("desc")
 	content := c.PostForm("content")
+	isPub := c.PostForm("is_pub")
 	modifiedBy := util.UserInfo.Username
 
 	var state int = -1
@@ -206,6 +209,8 @@ func (a ArticleController) EditArticle(c *gin.Context) {
 				}
 
 				data["is_top"] = isTop
+
+				data["is_pub"] = isPub
 
 				data["modified_by"] = modifiedBy
 
