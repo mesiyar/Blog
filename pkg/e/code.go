@@ -15,4 +15,5 @@ const (
 	ErrorTagExist              = 20008
 	ErrorTagNotExist           = 20009
 	ErrorArticleNotExist       = 20010
+	ErrorTodoListNotExist      = 20011
 )

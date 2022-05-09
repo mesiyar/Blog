@@ -50,11 +50,10 @@ func (u *UserController) GetUserInfo(c *gin.Context) {
 		code = e.ERROR
 	} else {
 		data["username"] = userInfo.Username
-		ip ,_ := util.Long2IPString(uint32(userInfo.LastLoginIp))
+		ip, _ := util.Long2IPString(uint32(userInfo.LastLoginIp))
 		data["last_login_ip"] = ip
-		data["last_login_time"] = time.Unix(int64(userInfo.LastLoginTime), 0).Format("2006-01-02 15:04:05")
+		data["last_login_time"] = util.UnixToStr(int64(userInfo.LastLoginTime))
 	}
-
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
