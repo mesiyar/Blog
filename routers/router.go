@@ -5,12 +5,13 @@ import (
 	_ "wechatNotify/docs"
 	"wechatNotify/pkg/upload"
 
-	"github.com/gin-gonic/gin"
 	"wechatNotify/middleware/cros"
 	"wechatNotify/middleware/jwt"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/routers/api"
 	v1 "wechatNotify/routers/api/v1"
+
+	"github.com/gin-gonic/gin"
 
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -70,6 +71,14 @@ func InitRouter() *gin.Engine {
 		admin.POST("/add_config", config.AddConfig)
 		admin.POST("/update_config", config.EditConfig)
 		admin.DELETE("/delete_config", config.DeleteConfig)
+
+		// 待办事项
+		todo := v1.TodolistController{}
+		admin.GET("/todolist", todo.GetTodolist)
+		admin.POST("/add_todolist", todo.Add)
+		admin.POST("/update_todolist", todo.Update)
+		admin.DELETE("/delete_todolist", todo.Delete)
+		admin.POST("/update_todolist_status", todo.UpdateFinishedStatus)
 	}
 
 	return r

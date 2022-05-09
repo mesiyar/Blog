@@ -10,8 +10,9 @@ require (
 	github.com/go-ini/ini v1.62.0
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/gorm v1.9.16
-	github.com/stretchr/testify v1.5.1 // indirect
+	github.com/olivere/elastic/v7 v7.0.32
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.5.1
 	github.com/unknwon/com v1.0.1
+	gopkg.in/ini.v1 v1.66.4 // indirect
 )
