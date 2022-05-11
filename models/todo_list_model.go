@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+	"wechatNotify/pkg/logging"
+	"wechatNotify/pkg/util"
+)
 
 type TodoList struct {
 	Model
@@ -22,7 +26,13 @@ type TodoListModel struct {
 
 func (todo *TodoListModel) GetTodoLists(pageNum int, pageSize int, maps interface{}) (todos []TodoList) {
 
-	db.Where(maps).Where("state = ?", IsStatusEnable).Offset(pageNum).Limit(pageSize).Find(&todos)
+	if err := db.Where(maps).
+		Where("state = ?", IsStatusEnable).
+		Where("created_on >= ?", util.TodayZeroTime()).
+		Offset(pageNum).Limit(pageSize).Find(&todos).Error; err != nil {
+		logging.Error("get todo list error: %v", err)
+		return nil
+	}
 	return
 }
 

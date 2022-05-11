@@ -79,6 +79,9 @@ func InitRouter() *gin.Engine {
 		admin.POST("/update_todolist", todo.Update)
 		admin.DELETE("/delete_todolist", todo.Delete)
 		admin.POST("/update_todolist_status", todo.UpdateFinishedStatus)
+
+		mail := v1.MailController{}
+		admin.GET("/mails", mail.GetMails)
 	}
 
 	return r

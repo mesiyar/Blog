@@ -6,6 +6,8 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/astaxie/beego v1.12.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/emersion/go-imap v1.2.1
+	github.com/emersion/go-message v0.15.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ini/ini v1.62.0
 	github.com/gomodule/redigo v2.0.0+incompatible

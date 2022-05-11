@@ -1,13 +1,13 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 	"wechatNotify/models"
 	"wechatNotify/pkg/e"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/pkg/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {

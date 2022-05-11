@@ -1,9 +1,10 @@
 package setting
 
 import (
-	"github.com/go-ini/ini"
 	"log"
 	"time"
+
+	"github.com/go-ini/ini"
 )
 
 var (
@@ -14,6 +15,7 @@ var (
 	HttpPort     int
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
+	PidFile      string
 
 	PageSize      int
 	JwtSecret     string
@@ -30,13 +32,13 @@ var (
 	RedisMaxIdle     int
 	RedisMaxActive   int
 	RedisIdleTimeout time.Duration
-// 天气预报配置
+	// 天气预报配置
 	WeatherUrl       string
 	WeatherAppID     string
 	WeatherAppSecret string
-	ImagePrefixUrl  string
-	ImageSavePath string
-	RuntimeRootPath string
+	ImagePrefixUrl   string
+	ImageSavePath    string
+	RuntimeRootPath  string
 )
 
 func init() {
@@ -56,6 +58,7 @@ func init() {
 	LoadRedis()
 	LoadWeather()
 }
+
 // 天气预报配置
 func LoadWeather() {
 	sec, err := Cfg.GetSection("weather")
@@ -88,6 +91,7 @@ func LoadApp() {
 	JwtSecret = sec.Key("JWT_SECRET ").MustString("!@)*#)!@U#@*!@!)")
 	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
 	JwtExpireTime = time.Duration(sec.Key("JWT_EXPIRE_TIME").MustInt(1800))
+	PidFile = sec.Key("PID_FILE").MustString("")
 }
 
 func LoadAuth() {

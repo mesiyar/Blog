@@ -19,7 +19,11 @@ func (c *ConfigModel) GetConfigs(page int, pageSize int, data map[string]interfa
 	return
 }
 
-
+// 根据 config_name 获取 config
+func (c *ConfigModel) GetConfigByName(configName string) (config Config) {
+	db.Where("config_name = ?", configName).First(&config)
+	return
+}
 
 // 获取总数
 func (c *ConfigModel) GetTotal(maps interface{}) (count int) {
@@ -38,9 +42,8 @@ func (c *ConfigModel) ExistByID(id int) bool {
 	return false
 }
 
-
 // 创建账号
-func (c *ConfigModel)CreateConfig(data map[string]string) bool {
+func (c *ConfigModel) CreateConfig(data map[string]string) bool {
 	var config Config
 	config.ConfigName = data["config_name"]
 	config.ConfigValue = data["config_value"]

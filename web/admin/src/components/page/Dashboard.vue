@@ -67,38 +67,39 @@
                 <el-card shadow="hover" style="height: 403px">
                     <div slot="header" class="clearfix">
                         <span>待办事项</span>
-                        <el-button style="float: right; padding: 3px 0" type="text">添加</el-button>
+                        <el-button style="float: right; padding: 3px 0" type="text" @click="addTodo">添加</el-button>
                     </div>
                     <el-table :show-header="false" :data="todoList" style="width: 100%">
                         <el-table-column width="40">
                             <template slot-scope="scope">
-                                <el-checkbox v-model="scope.row.status"></el-checkbox>
+                                <el-checkbox v-model="scope.row.finished_status"></el-checkbox>
                             </template>
                         </el-table-column>
                         <el-table-column>
                             <template slot-scope="scope">
-                                <div class="todo-item" :class="{ 'todo-item-del': scope.row.status }">{{ scope.row.title }}</div>
+                                <div v-if="scope.row.showInput">
+                                    <el-input
+                                        v-model="scope.row.todo"
+                                        @focus="focusEvent(scope.row)"
+                                        @blur="handleSaveTodo(scope.row)"
+                                        v-focus
+                                    ></el-input>
+                                </div>
+                                <div v-else>
+                                    <s v-if="scope.row.finished_status">{{ scope.row.todo }}</s>
+                                    <p v-else>{{ scope.row.todo }}</p>
+                                </div>
                             </template>
                         </el-table-column>
-                        <el-table-column width="60">
-                            <template>
-                                <i class="el-icon-edit"></i>
-                                <i class="el-icon-delete"></i>
+                        <el-table-column width="120">
+                            <template slot-scope="scope">
+                                <el-button type="text" icon="el-icon-edit" @click="handleEditTodo(scope.row)">编辑</el-button>
+                                <el-button type="text" icon="el-icon-delete" class="red" @click="handleDeleteTodo(scope.row)"
+                                    >删除</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
-                </el-card>
-            </el-col>
-        </el-row>
-        <el-row :gutter="20">
-            <el-col :span="12">
-                <el-card shadow="hover">
-                    <schart ref="bar" class="schart" canvasId="bar" :options="options"></schart>
-                </el-card>
-            </el-col>
-            <el-col :span="12">
-                <el-card shadow="hover">
-                    <schart ref="line" class="schart" canvasId="line" :options="options2"></schart>
                 </el-card>
             </el-col>
         </el-row>
@@ -107,7 +108,6 @@
 
 <script>
 import Schart from 'vue-schart';
-import bus from '../common/bus';
 import request from '../../utils/request';
 export default {
     name: 'dashboard',
@@ -119,69 +119,8 @@ export default {
                 lastLoginTime: '',
                 lastLoginIp: ''
             },
-            todoList: [
-                {
-                    title: '今天要修复100个bug',
-                    status: false
-                },
-                {
-                    title: '今天要修复100个bug',
-                    status: true
-                }
-            ],
-            data: [
-                {
-                    name: '2018/09/04',
-                    value: 1083
-                },
-                {
-                    name: '2018/09/05',
-                    value: 941
-                }
-            ],
-            options: {
-                type: 'bar',
-                title: {
-                    text: '最近一周各品类销售图'
-                },
-                xRorate: 25,
-                labels: ['周一', '周二', '周三', '周四', '周五'],
-                datasets: [
-                    {
-                        label: '家电',
-                        data: [234, 278, 270, 190, 230]
-                    },
-                    {
-                        label: '百货',
-                        data: [164, 178, 190, 135, 160]
-                    },
-                    {
-                        label: '食品',
-                        data: [144, 198, 150, 235, 120]
-                    }
-                ]
-            },
-            options2: {
-                type: 'line',
-                title: {
-                    text: '最近几个月各品类销售趋势图'
-                },
-                labels: ['6月', '7月', '8月', '9月', '10月'],
-                datasets: [
-                    {
-                        label: '家电',
-                        data: [234, 278, 270, 190, 230]
-                    },
-                    {
-                        label: '百货',
-                        data: [164, 178, 150, 135, 160]
-                    },
-                    {
-                        label: '食品',
-                        data: [74, 118, 200, 235, 90]
-                    }
-                ]
-            }
+            todoList: [],
+            data: []
         };
     },
     components: {
@@ -194,14 +133,17 @@ export default {
     },
     created() {
         this.getUserInfo();
+        this.getTodoList();
     },
-    // activated() {
-    //     this.handleListener();
-    // },
-    // deactivated() {
-    //     window.removeEventListener('resize', this.renderChart);
-    //     bus.$off('collapse', this.handleBus);
-    // },
+    //自定义指令
+    directives: {
+        focus: {
+            inserted: function (el) {
+                el.querySelector('input').focus();
+            }
+        }
+    },
+
     methods: {
         changeDate() {
             const now = new Date().getTime();
@@ -226,21 +168,87 @@ export default {
                 .catch((res) => {
                     console.log(res);
                 });
+        },
+        getTodoList() {
+            request
+                .get('/admin/todolist')
+                .then((res) => {
+                    if (res.code == 200) {
+                        this.todoList = [];
+                        res.data.list.forEach((item) => {
+                            item.showInput = false;
+                            this.todoList.push(item);
+                        });
+                    } else {
+                        this.$message.error(res.msg);
+                        return false;
+                    }
+                })
+                .catch((res) => {
+                    console.log(res);
+                });
+        },
+        handleSaveTodo(row) {
+            row.showInput = !row.showInput;
+            let url = row.id ? '/admin/update_todolist' : '/admin/add_todolist';
+            if (row.todo != row.oldTodo) {
+                request
+                    .post(url, row)
+                    .then((res) => {
+                        if (res.code == 200) {
+                            this.$message.success(res.msg);
+                            this.getTodoList();
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    })
+                    .catch((res) => {
+                        console.log(res);
+                    });
+            }
+        },
+        //点击输入框聚焦
+        focusEvent(row) {
+            row.oldTodo = row.todo;
+        },
+
+        addTodo() {
+            if (this.todoList.length == 0 || this.todoList[this.todoList.length - 1]['id'] != 0) {
+                this.todoList.push({
+                    id: 0,
+                    todo: '',
+                    oldTodo: '',
+                    finished_status: false,
+                    showInput: true
+                });
+            }
+        },
+        handleEditTodo(row) {
+            row.showInput = true;
+        },
+        handleDeleteTodo(row) {
+            // 二次确认删除
+            this.$confirm('确定要删除吗？', '提示', {
+                type: 'warning'
+            })
+                .then(() => {
+                    request
+                        .delete('/admin/delete_todolist?id=' + row.id)
+                        .then((res) => {
+                            if (res.code == 200) {
+                                this.$message.success('删除成功');
+                                this.getTodoList();
+                            } else {
+                                this.$message.error(res.msg);
+                                return false;
+                            }
+                        })
+                        .catch((res) => {
+                            console.log(res);
+                        });
+                })
+                .catch(() => {});
         }
-        // handleListener() {
-        //     bus.$on('collapse', this.handleBus);
-        //     // 调用renderChart方法对图表进行重新渲染
-        //     window.addEventListener('resize', this.renderChart);
-        // },
-        // handleBus(msg) {
-        //     setTimeout(() => {
-        //         this.renderChart();
-        //     }, 200);
-        // },
-        // renderChart() {
-        //     this.$refs.bar.renderChart();
-        //     this.$refs.line.renderChart();
-        // }
     }
 };
 </script>
