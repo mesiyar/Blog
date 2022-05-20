@@ -16,3 +16,8 @@ func JsonDecode(str string) (data map[string]interface{}, err error) {
 	err = json.Unmarshal([]byte(str), &data)
 	return data, err
 }
+
+func JsonEncode(data interface{}) (string, error) {
+	bytes, err := json.Marshal(data)
+	return string(bytes), err
+}

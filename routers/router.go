@@ -52,6 +52,7 @@ func InitRouter() *gin.Engine {
 		admin.POST("/create_account", api.CreateAuth)
 		admin.POST("/logout", api.Logout)
 		admin.GET("/get_user_info", user.GetUserInfo)
+		admin.GET("/weather", user.GetWeather)
 
 		admin.GET("/tags", tag.List)
 		admin.POST("/add_tag", tag.Add)

@@ -1,12 +1,12 @@
 package jwt
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 	"wechatNotify/pkg/e"
-	"wechatNotify/pkg/redisKey"
 	"wechatNotify/pkg/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 func JWT() gin.HandlerFunc {
@@ -23,20 +23,11 @@ func JWT() gin.HandlerFunc {
 
 			if err != nil {
 				code = e.ErrorAuthCheckTokenFail
-			} else {
-				redis := util.Redis{}
-				t, _ := redis.Get(redisKey.KeyAccountInfo)
-				t1, _ := util.JsonDecode(string(t))
-				if t1 != nil && t1["token"] != token {
-					code = e.ErrorAuthCheckTokenFail
-				} else {
-					if time.Now().Unix() > claims.ExpiresAt {
-						code = e.ErrorAuthCheckTokenTimeout
-					} else {
-
-					}
-				}
 			}
+			if time.Now().Unix() > claims.ExpiresAt {
+				code = e.ErrorAuthCheckTokenTimeout
+			}
+
 		}
 
 		if code != e.SUCCESS {

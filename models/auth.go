@@ -38,7 +38,7 @@ func CheckAuth(username, password, ip string) (b bool, id int) {
 				logging.Error("解析ip失败")
 			}
 			data["last_login_ip"] = sIp
-			db.Table("t_auth").Where("id = ?", auth.ID).Update(data)
+			db.Model(&auth).Where("id = ?", auth.ID).Update(data)
 			id = auth.ID
 			b = true
 			return

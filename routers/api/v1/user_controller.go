@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"wechatNotify/models"
 	"wechatNotify/pkg/e"
+	"wechatNotify/pkg/logging"
 	"wechatNotify/pkg/setting"
 	"wechatNotify/pkg/util"
 
@@ -32,7 +33,19 @@ func (u *UserController) GetUsers(c *gin.Context) {
 }
 
 func (u *UserController) GetWeather(c *gin.Context) {
-	ret := util.WeatherGet(util.GetWeatherCityName, "深圳")
+	// ip := c.ClientIP()
+	ip := "113.57.172.90"
+	res, err := util.GetIpAddress(ip)
+	logging.Info(res)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": e.ERROR,
+			"msg":  e.GetMsg(e.ERROR),
+			"data": res,
+		})
+	}
+
+	ret := util.WeatherGet(util.GetWeatherCityName, res.Data[2])
 	c.JSON(http.StatusOK, gin.H{
 		"code": e.SUCCESS,
 		"msg":  e.GetMsg(e.SUCCESS),
